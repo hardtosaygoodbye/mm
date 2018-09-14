@@ -17,10 +17,11 @@ class CNC:
         self.position = (num - 1) // 2
 
     def execute(self):
-        if self.is_empty == 1 or self.last_time == 0:
+        #print('num: ' + str(self.num) + '|work_timer: '+ str(self.work_timer))
+        if self.is_empty == 1 or self.work_timer == 0:
             self.waste_time = self.waste_time + 1
         else:
             self.work_timer = self.work_timer - 1
             if self.work_timer == 0:
-                print('num:' + str(num) + 'finish')
+                print('num:' + str(self.num) + 'finish')
 
