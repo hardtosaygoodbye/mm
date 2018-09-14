@@ -28,10 +28,11 @@ def time_of_work(cnc,rgv):
     cnc.last_time = cnc.one_work_time
     return real_time
 
-def work_time(cnc_arr,num_work):
+def work_time(cnc_arr):
     rgv = RGV(**rgv_config)
     total_time = 0.0
-    for current_work in range(0,num_work):
+    works = 0
+    while total_time < 28800:
         predict_min_time = 10000000000
         predict_cnc = None
         # 预测所有时间
@@ -46,22 +47,15 @@ def work_time(cnc_arr,num_work):
         for cnc in cnc_arr:
             cnc.work(real_time)
         total_time = total_time + real_time
-    return total_time
+        works  = works + 1
+    return works
 
 if __name__ == '__main__':
-    for i in range(300,500):
-        cnc_arr = []
-        for num in range(1,9):
-            cnc_config['num'] = num
-            cnc = CNC(**cnc_config)
-            cnc_arr.append(cnc)
-        total_time = work_time(cnc_arr,i)
-        if total_time < 28800:
-            print('-----------------------------')
-            print(i)
-            for cnc in cnc_arr:
-                print('num: ' + str(cnc.num))
-                print(cnc.waste_time)
-            print('total_time')
-            print(total_time)
-            print('-----------------------------')
+    cnc_arr = []
+    for num in range(1,9):
+        cnc_config['num'] = num
+        cnc = CNC(**cnc_config)
+        cnc_arr.append(cnc)
+    works = work_time(cnc_arr)
+    print(works)
+
