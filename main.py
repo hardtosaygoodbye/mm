@@ -49,16 +49,6 @@ def work_time(cnc_arr,num_work):
     return total_time
 
 if __name__ == '__main__':
-    '''
-    cnc_arr = []
-    for num in range(1,9):
-        cnc_config['num'] = num
-        cnc = CNC(**cnc_config)
-        cnc_arr.append(cnc)
-    total_time = work_time(cnc_arr,43)
-    for cnc in cnc_arr:
-        print(cnc.waste_time)
-    '''  
     for i in range(300,500):
         cnc_arr = []
         for num in range(1,9):
