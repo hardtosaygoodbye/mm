@@ -28,7 +28,12 @@ def time_of_work(cnc,rgv):
     cnc.last_time = cnc.one_work_time
     return real_time
 
-def work_time(cnc_arr):
+def main():
+    cnc_arr = []
+    for num in range(1,9):
+        cnc_config['num'] = num
+        cnc = CNC(**cnc_config)
+        cnc_arr.append(cnc)
     rgv = RGV(**rgv_config)
     total_time = 0.0
     works = 0
@@ -51,11 +56,6 @@ def work_time(cnc_arr):
     return works
 
 if __name__ == '__main__':
-    cnc_arr = []
-    for num in range(1,9):
-        cnc_config['num'] = num
-        cnc = CNC(**cnc_config)
-        cnc_arr.append(cnc)
-    works = work_time(cnc_arr)
+    works = main()
     print(works)
 
