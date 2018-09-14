@@ -38,7 +38,7 @@ def main():
     total_time = 0.0
     works = 0
     while total_time < 28800:
-        predict_min_time = 10000000000
+        predict_min_time = float("inf")
         predict_cnc = None
         # 预测所有时间
         for cnc in cnc_arr:
