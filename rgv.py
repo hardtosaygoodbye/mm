@@ -42,7 +42,7 @@ class RGV:
         self.wash_timer = k_wash_time
 
     # 投料
-    def place(self, cnc, new_work):
+    def place(self, cnc):
         if self.state != 0:
             raise
         self.state = 1
@@ -50,16 +50,15 @@ class RGV:
             self.place_timer = k_even_place_time
         else:
             self.place_timer = k_odd_place_time
-        self.target_cnc = cnc
         # 下料
         if cnc.work:
             cnc.work.first_place_down = self.current_time
             # 添加到输出队列
             self.log(cnc.work)
         # 上料
-        new_work.first_cnc_num = cnc.num
-        new_work.first_place_up = self.current_time
-        self.target_work = new_work
+        self.target_work.first_cnc_num = cnc.num
+        self.target_work.first_place_up = self.current_time
+        self.target_cnc = cnc
 
     def log(self,work):
         temp_dict = {
@@ -92,7 +91,7 @@ class RGV:
         if self.target_cnc.work:
             self.__wash()
         self.target_cnc.work_timer = k_one_work_time
-        self.target_cnc.work = self.target_work
+        self.target_cnc.work,self.target_work = self.target_work,self.target_cnc.work
 
     # 完成移动
     def __finish_move(self):

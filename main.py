@@ -59,7 +59,8 @@ def main():
                 else:
                     new_work = Work(work_num)
                     work_num = work_num + 1
-                    rgv.place(best_cnc, new_work)
+                    rgv.target_work = new_work
+                    rgv.place(best_cnc)
             else:    
                 rgv.move_to_position(best_cnc.position)
         for cnc in cnc_arr:
