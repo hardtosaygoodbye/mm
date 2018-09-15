@@ -1,11 +1,13 @@
 class Work:
-    one_work_time = 0
-    two_work_first_time = 0
-    two_work_second_time = 0
-    current_step = 1
+    step = 1
+    num = 0
+    first_cnc_num = 0
+    first_place_up = 0
+    first_place_down = 0
+    second_cnc_num = 0
+    second_place_up = 0
+    second_place_down = 0
 
-    def __init__(self,one_work_time,two_work_first_time,two_work_second_time):
-        self.one_work_time = one_work_time
-        self.two_work_first_time = two_work_first_time
-        self.two_work_second_time = two_work_second_time
+    def __init__(self,num):
+        self.num = num
 

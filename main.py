@@ -13,11 +13,11 @@ def get_move_time(position_x,position_y):
 def main():
     # 初始化对象
     cnc_arr = []
-    for num in range(1,9):
+    for num in range(1, 9):
         cnc = CNC(num)
         cnc_arr.append(cnc)
     rgv = RGV()
-    for i in range(0,28800):
+    for i in range(0, 28800):
         if rgv.state == 0:
             # 判断是否有负数
             has_minus = False

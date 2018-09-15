@@ -1,10 +1,9 @@
 class CNC:
-    # 常量
     num = 1
     position = 0
-    # 变量
     is_full = 0
     work_timer = 0
+    work = None
 
     def __init__(self, num):
         self.num = num
