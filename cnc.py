@@ -1,7 +1,6 @@
 class CNC:
     # 常量
     num = 1
-    place_time = 0
     position = 0
     # 变量
     is_full = 0
