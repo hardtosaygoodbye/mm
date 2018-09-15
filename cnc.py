@@ -18,9 +18,9 @@ class CNC:
             self.trouble_time = self.trouble_time - 1
             return
         if self.work_timer >  0:
-            if randint(0,100) == 0:
+            #if randint(0,100) == 0:
                 # 发生故障
-                self.trouble_time = randint(10*60,21*60)
+                #self.trouble_time = randint(10*60,21*60)
             self.work_timer = self.work_timer - 1
             if self.work_timer == 0:
                 self.__finish_process()
