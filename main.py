@@ -4,7 +4,6 @@ from work import Work
 from copy import copy
 from functools import cmp_to_key
 
-
 cnc_config = {
     'odd_place_time':28,
     'even_place_time':31

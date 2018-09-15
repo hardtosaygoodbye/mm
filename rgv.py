@@ -33,23 +33,20 @@ class RGV:
         if self.state != 0:
             raise
         distance = abs(position - self.position)
-        if distance == 0:
-            raise
-        self.position = position
-        self.move_timer = self.move_time_arr[distance - 1]
-        self.state = 1
+        if distance != 0:
+            self.state = 1
+            self.move_timer = self.move_time_arr[distance - 1]
+            self.position = position
 
     # 洗
-    def wash(self):
-        self.wash_timer = self.wash_time
+    def __wash(self):
         self.state = 1
+        self.wash_timer = self.wash_time
         self.work = None
 
     # 投料
     def place(self, cnc):
         if self.state != 0:
-            raise
-        if self.work == None:
             raise
         self.state = 1
         self.place_timer = cnc.place_time
@@ -58,7 +55,7 @@ class RGV:
         if cnc.is_empty == 1:
             pass 
         else:
-            self.wash()
+            self.__wash()
         cnc.is_empty = 0
         self.work = None
 
