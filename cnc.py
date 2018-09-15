@@ -1,7 +1,6 @@
 class CNC:
     num = 1
     position = 0
-    is_full = 0
     work_timer = 0
     work = None
 

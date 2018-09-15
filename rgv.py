@@ -14,6 +14,10 @@ class RGV:
     # place
     place_timer = 0
     target_cnc = None
+    last_work = None
+    current_time = 0
+    target_work = None
+    work_arr = []
 
     # 等待中
     def wait(self):
@@ -38,7 +42,7 @@ class RGV:
         self.wash_timer = k_wash_time
 
     # 投料
-    def place(self, cnc):
+    def place(self, cnc, new_work):
         if self.state != 0:
             raise
         self.state = 1
@@ -47,6 +51,24 @@ class RGV:
         else:
             self.place_timer = k_odd_place_time
         self.target_cnc = cnc
+        # 下料
+        if cnc.work:
+            cnc.work.first_place_down = self.current_time
+            # 添加到输出队列
+            self.log(cnc.work)
+        # 上料
+        new_work.first_cnc_num = cnc.num
+        new_work.first_place_up = self.current_time
+        self.target_work = new_work
+
+    def log(self,work):
+        temp_dict = {
+            'num':work.num,
+            'first_cnc_num': work.first_cnc_num,
+            'first_place_up': work.first_place_up,
+            'first_place_down': work.first_place_down
+        }
+        self.work_arr.append(temp_dict)
 
     # 执行
     def execute(self):
@@ -62,6 +84,15 @@ class RGV:
             self.place_timer = self.place_timer - 1
             if self.place_timer == 0:
                 self.__finish_place()
+        self.current_time = self.current_time + 1
+
+    # 投料完成
+    def __finish_place(self):
+        self.state = 0
+        if self.target_cnc.work:
+            self.__wash()
+        self.target_cnc.work_timer = k_one_work_time
+        self.target_cnc.work = self.target_work
 
     # 完成移动
     def __finish_move(self):
@@ -73,13 +104,6 @@ class RGV:
         self.state = 0
         self.total_count = self.total_count + 1
 
-    # 投料完成
-    def __finish_place(self):
-        self.state = 0
-        if self.target_cnc.is_full == 1:
-            self.__wash()
-        self.target_cnc.is_full = 1
-        self.target_cnc.work_timer = k_one_work_time
 
 if __name__ == '__main__':
     pass

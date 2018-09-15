@@ -17,6 +17,7 @@ def main():
         cnc = CNC(num)
         cnc_arr.append(cnc)
     rgv = RGV()
+    work_num = 1
     for i in range(0, 28800):
         if rgv.state == 0:
             # 判断是否有负数
@@ -51,16 +52,20 @@ def main():
                     if temp_time < min_time:
                         min_time = temp_time
                         best_cnc = cnc
+            # 对最佳cnc操作
             if rgv.position == best_cnc.position:
                 if best_cnc.work_timer > 0:
                     rgv.wait()
                 else:
-                    rgv.place(best_cnc)
+                    new_work = Work(work_num)
+                    work_num = work_num + 1
+                    rgv.place(best_cnc, new_work)
             else:    
                 rgv.move_to_position(best_cnc.position)
         for cnc in cnc_arr:
             cnc.execute()
         rgv.execute()
+    print(rgv.work_arr)
     print(rgv.total_count) 
 
 if __name__ == '__main__':
