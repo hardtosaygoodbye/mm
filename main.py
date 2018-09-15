@@ -75,7 +75,7 @@ if __name__ == '__main__':
     max_r = []
     ttt = None
     for i in itertools.product('12', repeat = 8):
-        r = main(i)
+        r = main(i,2)
         if len(r) > max:
             max = len(r)
             max_r = r

@@ -99,7 +99,13 @@ class RGV:
     # 投料完成
     def __finish_place(self):
         self.state = 0
-        self.target_cnc.work_timer = k_one_work_time
+        if self.target_work.total_step == 1:
+            self.target_cnc.work_timer = k_one_work_time
+        elif self.target_work.total_step == 2:
+            if self.target_work.step == 0:
+                self.target_cnc.work_timer = k_two_work_first_time
+            elif self.target_work.step == 1:
+                self.target_cnc.work_timer = k_two_work_second_time
         self.target_cnc.work,self.target_work = self.target_work,self.target_cnc.work
         if self.target_work:
             if self.target_work.step == self.target_work.total_step:
