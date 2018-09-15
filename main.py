@@ -12,7 +12,7 @@ def get_move_time(position_x,position_y):
         return k_move_time_arr[distance - 1]
     return 0
 
-def main(tools = [1]*9,step = 1):
+def main(tools = [1] * 8, step = 1):
     # 初始化对象
     cnc_arr = []
     for i in range(0, 8):
@@ -20,6 +20,7 @@ def main(tools = [1]*9,step = 1):
         cnc_arr.append(cnc)
     rgv = RGV()
     work_num = 1
+    # 开始工作
     for i in range(0, 28800):
         if rgv.state == 0:
             temp_cnc_arr = []
@@ -81,11 +82,6 @@ def main(tools = [1]*9,step = 1):
         rgv.execute()
     return rgv.work_arr
 
-
-def debug(cnc_arr):
-    for cnc in cnc_arr:
-        print(cnc.work_timer)
-
 if __name__ == '__main__':
     '''
     max = 0
@@ -102,4 +98,4 @@ if __name__ == '__main__':
     print(ttt)
     '''
     r = main()
-    print(r[0:11])
+    print(len(r))
