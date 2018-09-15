@@ -12,7 +12,7 @@ def get_move_time(position_x,position_y):
         return k_move_time_arr[distance - 1]
     return 0
 
-def main(tools = [1]*9):
+def main(tools = [1]*9,step = 1):
     # 初始化对象
     cnc_arr = []
     for i in range(0, 8):
@@ -70,7 +70,7 @@ def main(tools = [1]*9):
                     rgv.wait()
                 else:
                     if not rgv.target_work:
-                        new_work = Work(work_num, 1)
+                        new_work = Work(work_num, step)
                         work_num = work_num + 1
                         rgv.target_work = new_work
                     rgv.place(best_cnc)
