@@ -10,14 +10,6 @@ def get_move_time(position_x,position_y):
         return k_move_time_arr[distance - 1]
     return 0
 
-def cmpf(a,b,rgv):
-    a_distance = abs(a.position - rgv.position)
-    b_distance = abs(b.position - rgv.position)
-    if (a_distance != b_distance):
-        return a_distance - b_distance
-    else:
-        return a.place_time - b.place_time
-
 def main():
     # 初始化对象
     cnc_arr = []
@@ -37,12 +29,16 @@ def main():
             best_cnc = None
             if has_minus:
                 # 有负数情况
-                temp_cnc_arr = []
                 for cnc in cnc_arr:
                     if cnc.work_timer - get_move_time(cnc.position, rgv.position) <= 0:
-                        temp_cnc_arr.append(cnc)
-                temp_cnc_arr.sort(key=cmp_to_key(lambda a,b:cmpf(a,b,rgv)))
-                best_cnc = temp_cnc_arr[0]
+                        place_time = 0
+                        if cnc.num % 2 == 0:
+                            place_time = k_even_place_time
+                        else:
+                            place_time = k_odd_place_time
+                        if get_move_time(cnc.position, rgv.position) + place_time < min_time:
+                            min_time = get_move_time(cnc.position, rgv.position) + place_time
+                            best_cnc = cnc
             else:
                 # 全为正数
                 for cnc in cnc_arr:

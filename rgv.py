@@ -21,6 +21,7 @@ class RGV:
 
     # 移动到位置
     def move_to_position(self, position):
+        print('移动到'+ str(position))
         if self.state != 0:
             raise
         distance = abs(position - self.position)
