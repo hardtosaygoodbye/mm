@@ -1,28 +1,19 @@
 from copy import copy
+from config import *
 
 class RGV:
-    # 常量
-    move_time_arr = [0,0,0]
-    wash_time = 0
     position = 0
     # 用于判断是否被指令占用
     state = 0
-    # 移动计数器
+    # move
+    target_position = 0
     move_timer = 0
-    # 清洗计时器
+    # wash
     wash_timer = 0
-    # 投料计时器
+    # place
     place_timer = 0
-    # 持有工作
-    work = None
-    # 总数
-    total_count = 0
     # cnc
-    current_cnc = None
-
-    def __init__(self,move_time_arr,wash_time):
-        self.wash_time = wash_time
-        self.move_time_arr = move_time_arr
+    target_cnc = None
 
     # 等待中
     def wait(self):
@@ -33,13 +24,16 @@ class RGV:
         if self.state != 0:
             raise
         distance = abs(position - self.position)
-        if distance != 0:
-            self.state = 1
-            self.move_timer = self.move_time_arr[distance - 1]
-            self.position = position
+        if distance == 0:
+            return
+        self.state = 1
+        self.move_timer = k_move_time_arr[distance - 1]
+        self.target_position = position
 
     # 洗
     def __wash(self):
+        if self.state != 0:
+            raise
         self.state = 1
         self.wash_timer = self.wash_time
         self.work = None
@@ -49,36 +43,34 @@ class RGV:
         if self.state != 0:
             raise
         self.state = 1
-        self.place_timer = cnc.place_time
-        cnc.work = copy(self.work)
-        self.current_cnc = cnc
-        if cnc.is_empty == 1:
-            pass 
+        if cnc.num % 2 == 0:
+            self.place_timer = k_even_place_time
         else:
-            self.__wash()
-        cnc.is_empty = 0
-        self.work = None
+            self.place_timer = k_odd_place_time
+        self.target_cnc = cnc
 
     # 执行
     def execute(self):
-        once_token = 1
-        if self.move_timer > 0 and once_token:
+        if self.move_timer > 0:
             once_token = 0
             self.move_timer = self.move_timer - 1
             if self.move_timer == 0:
                 self.state = 0
-        if self.wash_timer > 0 and once_token:
-            once_token = 0
+                self.position = self.target_position
+        if self.wash_timer > 0:
             self.wash_timer = self.wash_timer - 1
             if self.wash_timer == 0:
                 self.state = 0
                 self.total_count = self.total_count + 1
-        if self.place_timer > 0 and once_token:
-            once_token = 0
+        if self.place_timer > 0:
             self.place_timer = self.place_timer - 1
             if self.place_timer == 0:
-                self.current_cnc.work_timer = self.current_cnc.work.one_work_time
+                # 投料完成
                 self.state = 0
+                if self.target_cnc.is_full == 1:
+                    self.__wash()
+                self.target_cnc.is_full = 1
+                self.target_cnc.work_timer = k_one_work_time
 
 if __name__ == '__main__':
     pass

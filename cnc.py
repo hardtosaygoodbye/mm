@@ -4,9 +4,8 @@ class CNC:
     place_time = 0
     position = 0
     # 变量
-    is_empty = 1
+    is_full = 0
     work_timer = 0
-    waste_time = 0
 
     def __init__(self, num, odd_place_time, even_place_time):
         self.num = num
@@ -18,7 +17,7 @@ class CNC:
 
     def execute(self):
         if self.work_timer == 0:
-            self.waste_time = self.waste_time + 1
+            pass
         else:
             self.work_timer = self.work_timer - 1
 
