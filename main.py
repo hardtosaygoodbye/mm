@@ -70,7 +70,7 @@ def main(tools = [1]*9):
                     rgv.wait()
                 else:
                     if not rgv.target_work:
-                        new_work = Work(work_num,2)
+                        new_work = Work(work_num, 1)
                         work_num = work_num + 1
                         rgv.target_work = new_work
                     rgv.place(best_cnc)
@@ -81,7 +81,13 @@ def main(tools = [1]*9):
         rgv.execute()
     return rgv.work_arr
 
+
+def debug(cnc_arr):
+    for cnc in cnc_arr:
+        print(cnc.work_timer)
+
 if __name__ == '__main__':
+    '''
     max = 0
     max_r = []
     ttt = None
@@ -94,3 +100,6 @@ if __name__ == '__main__':
     print(max)
     print(max_r)
     print(ttt)
+    '''
+    r = main()
+    print(r[0:11])
