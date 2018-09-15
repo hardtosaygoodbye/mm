@@ -88,10 +88,11 @@ class RGV:
     # 投料完成
     def __finish_place(self):
         self.state = 0
-        if self.target_cnc.work:
-            self.__wash()
         self.target_cnc.work_timer = k_one_work_time
         self.target_cnc.work,self.target_work = self.target_work,self.target_cnc.work
+        if self.target_work:
+            if self.target_work.step == self.target_work.total_step:
+                self.__wash()
 
     # 完成移动
     def __finish_move(self):
@@ -102,6 +103,7 @@ class RGV:
     def __finish_wash(self):
         self.state = 0
         self.total_count = self.total_count + 1
+        self.target_work = None
 
 
 if __name__ == '__main__':

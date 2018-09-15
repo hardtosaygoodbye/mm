@@ -3,6 +3,7 @@ from rgv import RGV
 from work import Work
 from functools import cmp_to_key
 from config import *
+from copy import *
 
 def get_move_time(position_x,position_y):
     distance = abs(position_x - position_y)
@@ -13,16 +14,25 @@ def get_move_time(position_x,position_y):
 def main():
     # 初始化对象
     cnc_arr = []
-    for num in range(1, 9):
+    for num in range(1, 8):
         cnc = CNC(num)
         cnc_arr.append(cnc)
+    cnc_arr.append(CNC(8, 2))
     rgv = RGV()
     work_num = 1
     for i in range(0, 28800):
         if rgv.state == 0:
+            temp_cnc_arr = []
+            for cnc in cnc_arr:
+                if rgv.target_work:
+                    if rgv.target_work.step == cnc.tool:
+                        temp_cnc_arr.append(cnc)
+                else:
+                    if cnc.tool == 1:
+                        temp_cnc_arr.append(cnc)
             # 判断是否有负数
             has_minus = False
-            for cnc in cnc_arr:
+            for cnc in temp_cnc_arr:
                 if cnc.work_timer - get_move_time(cnc.position, rgv.position) < 0:
                     has_minus = True
                     break
@@ -30,7 +40,7 @@ def main():
             best_cnc = None
             if has_minus:
                 # 有负数情况
-                for cnc in cnc_arr:
+                for cnc in temp_cnc_arr:
                     if cnc.work_timer - get_move_time(cnc.position, rgv.position) <= 0:
                         place_time = 0
                         if cnc.num % 2 == 0:
@@ -42,7 +52,7 @@ def main():
                             best_cnc = cnc
             else:
                 # 全为正数
-                for cnc in cnc_arr:
+                for cnc in temp_cnc_arr:
                     place_time = 0
                     if cnc.num % 2 == 0:
                         place_time = k_even_place_time
@@ -57,7 +67,7 @@ def main():
                 if best_cnc.work_timer > 0:
                     rgv.wait()
                 else:
-                    new_work = Work(work_num)
+                    new_work = Work(work_num,1)
                     work_num = work_num + 1
                     rgv.target_work = new_work
                     rgv.place(best_cnc)
