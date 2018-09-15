@@ -7,17 +7,11 @@ class CNC:
     is_full = 0
     work_timer = 0
 
-    def __init__(self, num, odd_place_time, even_place_time):
+    def __init__(self, num):
         self.num = num
-        if num % 2 == 0:
-            self.place_time = even_place_time
-        else:
-            self.place_time = odd_place_time
         self.position = (num - 1) // 2
 
     def execute(self):
-        if self.work_timer == 0:
-            pass
-        else:
+        if self.work_timer >  0:
             self.work_timer = self.work_timer - 1
 
