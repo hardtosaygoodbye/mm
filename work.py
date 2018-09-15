@@ -1,5 +1,5 @@
 class Work:
-    step = 1
+    step = 0
     total_step = 1
     num = 0
     first_cnc_num = 0

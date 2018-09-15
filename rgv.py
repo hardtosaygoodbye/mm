@@ -19,6 +19,9 @@ class RGV:
     target_work = None
     work_arr = []
 
+    def __init__(self):
+        self.work_arr = []
+
     # 等待中
     def wait(self):
         pass
@@ -52,12 +55,17 @@ class RGV:
             self.place_timer = k_odd_place_time
         # 下料
         if cnc.work:
-            cnc.work.first_place_down = self.current_time
-            # 添加到输出队列
-            self.log(cnc.work)
+            if cnc.work.step == 1:
+                cnc.work.first_place_down = self.current_time
+            elif cnc.work.step == 2:
+                cnc.work.second_place_down = self.current_time
         # 上料
-        self.target_work.first_cnc_num = cnc.num
-        self.target_work.first_place_up = self.current_time
+        if self.target_work.step == 0:
+            self.target_work.first_cnc_num = cnc.num
+            self.target_work.first_place_up = self.current_time
+        elif self.target_work.step == 1:
+            self.target_work.second_cnc_num = cnc.num
+            self.target_work.second_place_up = self.current_time
         self.target_cnc = cnc
 
     def log(self,work):
@@ -65,7 +73,10 @@ class RGV:
             'num':work.num,
             'first_cnc_num': work.first_cnc_num,
             'first_place_up': work.first_place_up,
-            'first_place_down': work.first_place_down
+            'first_place_down': work.first_place_down,
+            'second_cnc_num': work.second_cnc_num,
+            'second_place_num': work.second_place_up,
+            'second_place_down': work.second_place_down
         }
         self.work_arr.append(temp_dict)
 
@@ -103,8 +114,8 @@ class RGV:
     def __finish_wash(self):
         self.state = 0
         self.total_count = self.total_count + 1
+        self.log(self.target_work)
         self.target_work = None
-
 
 if __name__ == '__main__':
     pass

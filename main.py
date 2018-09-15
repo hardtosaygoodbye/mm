@@ -4,6 +4,7 @@ from work import Work
 from functools import cmp_to_key
 from config import *
 from copy import *
+import itertools
 
 def get_move_time(position_x,position_y):
     distance = abs(position_x - position_y)
@@ -11,13 +12,12 @@ def get_move_time(position_x,position_y):
         return k_move_time_arr[distance - 1]
     return 0
 
-def main():
+def main(tools = [1]*9):
     # 初始化对象
     cnc_arr = []
-    for num in range(1, 8):
-        cnc = CNC(num)
+    for i in range(0, 8):
+        cnc = CNC(i+1,tools[i])
         cnc_arr.append(cnc)
-    cnc_arr.append(CNC(8, 2))
     rgv = RGV()
     work_num = 1
     for i in range(0, 28800):
@@ -25,7 +25,7 @@ def main():
             temp_cnc_arr = []
             for cnc in cnc_arr:
                 if rgv.target_work:
-                    if rgv.target_work.step == cnc.tool:
+                    if rgv.target_work.step + 1 == cnc.tool:
                         temp_cnc_arr.append(cnc)
                 else:
                     if cnc.tool == 1:
@@ -62,22 +62,35 @@ def main():
                     if temp_time < min_time:
                         min_time = temp_time
                         best_cnc = cnc
+            if not best_cnc:
+                return []
             # 对最佳cnc操作
             if rgv.position == best_cnc.position:
                 if best_cnc.work_timer > 0:
                     rgv.wait()
                 else:
-                    new_work = Work(work_num,1)
-                    work_num = work_num + 1
-                    rgv.target_work = new_work
+                    if not rgv.target_work:
+                        new_work = Work(work_num,2)
+                        work_num = work_num + 1
+                        rgv.target_work = new_work
                     rgv.place(best_cnc)
             else:    
                 rgv.move_to_position(best_cnc.position)
         for cnc in cnc_arr:
             cnc.execute()
         rgv.execute()
-    print(rgv.work_arr)
-    print(rgv.total_count) 
+    return rgv.work_arr
 
 if __name__ == '__main__':
-    main()
+    max = 0
+    max_r = []
+    ttt = None
+    for i in itertools.product('12', repeat = 8):
+        r = main(i)
+        if len(r) > max:
+            max = len(r)
+            max_r = r
+            ttt = i
+    print(max)
+    print(max_r)
+    print(ttt)
