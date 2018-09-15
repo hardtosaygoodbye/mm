@@ -17,6 +17,8 @@ class RGV:
     work = None
     # 总数
     total_count = 0
+    # cnc
+    current_cnc = None
 
     def __init__(self,move_time_arr,wash_time):
         self.wash_time = wash_time
@@ -42,7 +44,6 @@ class RGV:
         self.wash_timer = self.wash_time
         self.state = 1
         self.work = None
-        self.total_count = self.total_count + 1
 
     # 投料
     def place(self, cnc):
@@ -53,7 +54,7 @@ class RGV:
         self.state = 1
         self.place_timer = cnc.place_time
         cnc.work = copy(self.work)
-        cnc.work_timer = cnc.work.one_work_time
+        self.current_cnc = cnc
         if cnc.is_empty == 1:
             pass 
         else:
@@ -74,10 +75,12 @@ class RGV:
             self.wash_timer = self.wash_timer - 1
             if self.wash_timer == 0:
                 self.state = 0
+                self.total_count = self.total_count + 1
         if self.place_timer > 0 and once_token:
             once_token = 0
             self.place_timer = self.place_timer - 1
             if self.place_timer == 0:
+                self.current_cnc.work_timer = self.current_cnc.work.one_work_time
                 self.state = 0
 
 if __name__ == '__main__':

@@ -65,7 +65,7 @@ if __name__ == '__main__':
                     move_time = 0
                     if distance != 0:
                         move_time = rgv.move_time_arr[distance - 1]
-                    if cnc.work_timer - move_time < 0:
+                    if cnc.work_timer - move_time <= 0:
                         temp_cnc_arr.append(cnc)
                 temp_cnc_arr = sorted(temp_cnc_arr, key=cmp_to_key(lambda a,b:cmpf(a,b,rgv)))
                 best_cnc = temp_cnc_arr[0]
@@ -89,3 +89,5 @@ if __name__ == '__main__':
             cnc.execute()
         rgv.execute()
     print(rgv.total_count) 
+    for cnc in cnc_arr:
+        print(cnc.waste_time)
