@@ -20,8 +20,8 @@ def get_has_minus(cnc_arr,rgv):
             break
     return has_minus
 
-def main(tools = [1] * 8, step = 1):
-    cnc_arr = [CNC(i+1, tools[i]) for i in range(0,8)]
+def main(tools = [1] * 8, step = 1, is_error = False):
+    cnc_arr = [CNC(i+1, tools[i], is_error) for i in range(0,8)]
     rgv = RGV()
     work_num = 1
     for i in range(0, 28800):
@@ -40,11 +40,7 @@ def main(tools = [1] * 8, step = 1):
                 # 有负数情况
                 for cnc in temp_cnc_arr:
                     if cnc.work_timer - get_move_time(cnc.position, rgv.position) <= 0:
-                        place_time = 0
-                        if cnc.num % 2 == 0:
-                            place_time = k_even_place_time
-                        else:
-                            place_time = k_odd_place_time
+                        place_time = k_even_place_time if cnc.num % 2 == 0 else k_odd_place_time
                         if get_move_time(cnc.position, rgv.position) + place_time < min_time:
                             min_time = get_move_time(cnc.position, rgv.position) + place_time
                             best_cnc = cnc
@@ -88,5 +84,5 @@ if __name__ == '__main__':
     print(max_r)
     print(ttt)
     '''
-    r = main()
+    r = main(is_error = True)
     print(len(r))
