@@ -73,11 +73,11 @@ def main(tools = [1] * 8, step = 1, is_error = False):
 
 def no_err_one_step():
     rgv,cnc_arr =  main()
-    return {'rgv':rgv,'cnc_arr':cnc_arr}
+    return {'rgv':rgv,'cnc_arr':cnc_arr,'is_error':False,'step':1}
 
 def err_one_step():
     rgv,cnc_arr = main(is_error = True)
-    return {'rgv':rgv,'cnc_arr':cnc_arr}
+    return {'rgv':rgv,'cnc_arr':cnc_arr, 'is_error':True,'step':1}
 
 def no_err_two_step():
     max_num_work = 0
@@ -91,8 +91,7 @@ def no_err_two_step():
             best_rgv = rgv
             best_cnc_arr = cnc_arr
             best_tools = i
-    return {'rgv':best_rgv,'cnc_arr': best_cnc_arr, 'tools':best_tools}
-
+    return {'rgv':best_rgv,'cnc_arr': best_cnc_arr, 'tools':best_tools,'is_error':False,'step':2}
 
 def err_two_step():
     max_num_work = 0
@@ -106,9 +105,9 @@ def err_two_step():
             best_rgv = rgv
             best_cnc_arr = cnc_arr
             best_tools = i
-    return {'rgv':best_rgv,'cnc_arr': best_cnc_arr, 'tools':best_tools}
+    return {'rgv':best_rgv,'cnc_arr': best_cnc_arr, 'tools':best_tools,'is_error':True,'step':2}
 
-def output(rgv, cnc_arr, tools = ['1']*8):
+def output(rgv, cnc_arr, tools = ['1']*8, is_error = False, step = 1):
     first_cnc=[]
     first_place_up=[]
     first_place_down=[]
@@ -126,9 +125,31 @@ def output(rgv, cnc_arr, tools = ['1']*8):
         num.append(work.num)
     df=pd.DataFrame({'num':num,'first_cnc':first_cnc,'first_place_up':first_place_up,'first_place_down':first_place_down,
                       'second_cnc':second_cnc,'second_place_up':second_place_up,'second_place_down':second_place_down})
-    excel_path = 'log/' + ','.join(tools) + '.xlsx' 
+    excel_path = 'log/' + str(step) + '步工序' + ('错误' if is_error else '无错误') + '-'  + ','.join(tools) + '加工日志.xlsx' 
     # 判断类型
-    df[['num','first_cnc','first_place_up','first_place_down','second_cnc','second_place_up','second_place_down']].to_excel(excel_path,index=False)
-   
+    if step == 1:
+        # 一步工序
+        df[['num','first_cnc','first_place_up','first_place_down']].to_excel(excel_path,index=False)
+    elif step == 2:
+        # 两步工序
+        df[['num','first_cnc','first_place_up','first_place_down','second_cnc','second_place_up','second_place_down']].to_excel(excel_path,index=False)
+    # 判断是否错误
+    if is_error:
+        excel_path = 'log/' + str(step) + '步工序' + ('错误' if is_error else '无错误') + '-'  + ','.join(tools) + '错误日志.xlsx' 
+        err_cnc_num = []
+        err_begin = []
+        err_end = []
+        for cnc in cnc_arr:
+            for err_dict in cnc.err_log:
+                err_cnc_num.append(err_dict['err_cnc_num'])
+                err_begin.append(err_dict['err_begin'])
+                err_end.append(err_dict['err_end'])
+        df = pd.DataFrame({'err_cnc_num':err_cnc_num, 'err_begin':err_begin, 'err_end':err_end})
+        df[['err_cnc_num','err_begin','err_end']].to_excel(excel_path,index=False)
+
 if __name__ == '__main__':
     output(**no_err_one_step())
+    output(**err_one_step())
+    output(**no_err_two_step())
+    output(**err_two_step())
+
