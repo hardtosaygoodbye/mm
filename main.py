@@ -164,6 +164,7 @@ def output(rgv, cnc_arr, tools = ['1']*8, is_error = False, step = 1):
             
 
 def output_all():
+    print('正在玩命计算中，请稍后')
     output(**no_err_one_step())
     output(**err_one_step())
     output(**no_err_two_step())
