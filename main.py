@@ -5,6 +5,7 @@ from functools import cmp_to_key
 from config import *
 from copy import *
 import itertools
+import pandas as pd
 
 def get_move_time(position_x, position_y):
     distance = abs(position_x - position_y)
@@ -28,12 +29,13 @@ def main(tools = [1] * 8, step = 1, is_error = False):
         if rgv.state == 0:
             temp_cnc_arr = []
             for cnc in cnc_arr:
-                if rgv.target_work:
-                    if rgv.target_work.step + 1 == cnc.tool:
-                        temp_cnc_arr.append(cnc)
-                else:
-                    if cnc.tool == 1:
-                        temp_cnc_arr.append(cnc)
+                if cnc.trouble_time == 0:
+                    if rgv.target_work:
+                        if rgv.target_work.step + 1 == cnc.tool:
+                            temp_cnc_arr.append(cnc)
+                    else:
+                        if cnc.tool == 1:
+                            temp_cnc_arr.append(cnc)
             min_time = float('inf')
             best_cnc = None
             if get_has_minus(temp_cnc_arr,rgv):
@@ -52,7 +54,7 @@ def main(tools = [1] * 8, step = 1, is_error = False):
                     if temp_time < min_time:
                         min_time = temp_time
                         best_cnc = cnc
-            if not best_cnc:return []
+            if not best_cnc:return (rgv,cnc_arr)
             # 对最佳cnc操作
             if rgv.position == best_cnc.position:
                 if best_cnc.work_timer > 0:
@@ -67,22 +69,66 @@ def main(tools = [1] * 8, step = 1, is_error = False):
                 rgv.move_to_position(best_cnc.position)
         for cnc in cnc_arr:cnc.execute()
         rgv.execute()
-    return rgv.work_arr
+    return (rgv,cnc_arr)
 
-if __name__ == '__main__':
-    '''
-    max = 0
-    max_r = []
-    ttt = None
+def no_err_one_step():
+    rgv,cnc_arr =  main()
+    return {'rgv':rgv,'cnc_arr':cnc_arr}
+
+def err_one_step():
+    rgv,cnc_arr = main(is_error = True)
+    return {'rgv':rgv,'cnc_arr':cnc_arr}
+
+def no_err_two_step():
+    max_num_work = 0
+    best_rgv = None
+    best_cnc_arr = None
+    best_tools = None
     for i in itertools.product('12', repeat = 8):
-        r = main(i,2)
-        if len(r) > max:
-            max = len(r)
-            max_r = r
-            ttt = i
-    print(max)
-    print(max_r)
-    print(ttt)
-    '''
-    r = main(is_error = True)
-    print(len(r))
+        rgv,cnc_arr = main(i,2)
+        if len(rgv.work_arr) > max_num_work:
+            max_num_work = len(rgv.work_arr)
+            best_rgv = rgv
+            best_cnc_arr = cnc_arr
+            best_tools = i
+    return {'rgv':best_rgv,'cnc_arr': best_cnc_arr, 'tools':best_tools}
+
+
+def err_two_step():
+    max_num_work = 0
+    best_rgv = None
+    best_cnc_arr = None
+    best_tools = None
+    for i in itertools.product('12', repeat = 8):
+        rgv,cnc_arr = main(i,2,is_error = True)
+        if len(rgv.work_arr) > max_num_work:
+            max_num_work = len(rgv.work_arr)
+            best_rgv = rgv
+            best_cnc_arr = cnc_arr
+            best_tools = i
+    return {'rgv':best_rgv,'cnc_arr': best_cnc_arr, 'tools':best_tools}
+
+def output(rgv, cnc_arr, tools = ['1']*8):
+    first_cnc=[]
+    first_place_up=[]
+    first_place_down=[]
+    second_cnc=[]
+    second_place_up=[]
+    second_place_down=[]
+    num=[]
+    for work in rgv.work_arr:
+        first_cnc.append(work.first_cnc_num)
+        first_place_up.append(work.first_place_up)
+        first_place_down.append(work.first_place_down)
+        second_cnc.append(work.second_cnc_num)
+        second_place_up.append(work.second_place_up)
+        second_place_down.append(work.second_place_down)
+        num.append(work.num)
+    df=pd.DataFrame({'num':num,'first_cnc':first_cnc,'first_place_up':first_place_up,'first_place_down':first_place_down,
+                      'second_cnc':second_cnc,'second_place_up':second_place_up,'second_place_down':second_place_down})
+    excel_path = 'log/' + ','.join(tools) + '.xlsx' 
+    # 判断类型
+    df[['num','first_cnc','first_place_up','first_place_down','second_cnc','second_place_up','second_place_down']].to_excel(excel_path,index=False)
+   
+if __name__ == '__main__':
+    output(**no_err_one_step())

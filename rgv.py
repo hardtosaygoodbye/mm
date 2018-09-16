@@ -78,7 +78,7 @@ class RGV:
             'second_place_num': work.second_place_up,
             'second_place_down': work.second_place_down
         }
-        self.work_arr.append(temp_dict)
+        self.work_arr.append(work)
 
     # 执行
     def execute(self):
