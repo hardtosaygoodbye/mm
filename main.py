@@ -6,6 +6,7 @@ from config import *
 from copy import *
 import itertools
 import pandas as pd
+from datetime import datetime
 
 def get_move_time(position_x, position_y):
     distance = abs(position_x - position_y)
@@ -27,46 +28,49 @@ def main(tools = [1] * 8, step = 1, is_error = False):
     work_num = 1
     for i in range(0, 28800):
         if rgv.state == 0:
+            # 检查是否持有物料
+            if rgv.target_work == None:
+                rgv.target_work = Work(work_num,step)
+                work_num = work_num + 1
+            # 筛选故障cnc和不同加工工序的cnc
             temp_cnc_arr = []
             for cnc in cnc_arr:
-                if cnc.trouble_time == 0:
-                    if rgv.target_work:
-                        if rgv.target_work.step + 1 == cnc.tool:
-                            temp_cnc_arr.append(cnc)
-                    else:
-                        if cnc.tool == 1:
-                            temp_cnc_arr.append(cnc)
+                if cnc.trouble_time != 0:
+                    continue
+                if rgv.target_work.step + 1 == cnc.tool:
+                    temp_cnc_arr.append(cnc)
+            # 打擂找出最佳目标cnc
             min_time = float('inf')
             best_cnc = None
             if get_has_minus(temp_cnc_arr,rgv):
                 # 有负数情况
                 for cnc in temp_cnc_arr:
-                    if cnc.work_timer - get_move_time(cnc.position, rgv.position) <= 0:
-                        place_time = k_even_place_time if cnc.num % 2 == 0 else k_odd_place_time
-                        if get_move_time(cnc.position, rgv.position) + place_time < min_time:
-                            min_time = get_move_time(cnc.position, rgv.position) + place_time
-                            best_cnc = cnc
+                    # 去除正数
+                    if cnc.work_timer - get_move_time(cnc.position, rgv.position) > 0:
+                        continue
+                    # 求出放置移动时间加上下料时间最小的数
+                    place_time = k_even_place_time if cnc.num % 2 == 0 else k_odd_place_time
+                    if get_move_time(cnc.position, rgv.position) + place_time < min_time:
+                        min_time = get_move_time(cnc.position, rgv.position) + place_time
+                        best_cnc = cnc
             else:
                 # 全为正数
+                # 求出剩余工作时间加上上下料时间最短
                 for cnc in temp_cnc_arr:
                     place_time = k_even_place_time if cnc.num % 2 == 0 else k_odd_place_time
                     temp_time = cnc.work_timer + place_time
                     if temp_time < min_time:
                         min_time = temp_time
                         best_cnc = cnc
+            # 未找到最佳cnc则退出
             if not best_cnc:return (rgv,cnc_arr)
-            # 对最佳cnc操作
-            if rgv.position == best_cnc.position:
-                if best_cnc.work_timer > 0:
-                    rgv.wait()
-                else:
-                    if not rgv.target_work:
-                        new_work = Work(work_num, step)
-                        work_num = work_num + 1
-                        rgv.target_work = new_work
-                    rgv.place(best_cnc)
-            else:    
-                rgv.move_to_position(best_cnc.position)
+            # 对rgv下达指令
+            rgv.move_to_position(best_cnc.position)
+            if best_cnc.work_timer > 0:
+                rgv.wait()
+            else:
+                rgv.place(best_cnc)
+        # cnc,rgv 执行指令
         for cnc in cnc_arr:cnc.execute()
         rgv.execute()
     return (rgv,cnc_arr)
@@ -147,9 +151,14 @@ def output(rgv, cnc_arr, tools = ['1']*8, is_error = False, step = 1):
         df = pd.DataFrame({'err_cnc_num':err_cnc_num, 'err_begin':err_begin, 'err_end':err_end})
         df[['err_cnc_num','err_begin','err_end']].to_excel(excel_path,index=False)
 
-if __name__ == '__main__':
+def output_all():
     output(**no_err_one_step())
     output(**err_one_step())
     output(**no_err_two_step())
     output(**err_two_step())
+
+if __name__ == '__main__':
+    r = no_err_one_step()
+    rgv = r['rgv']
+    print(len(rgv.work_arr))
 

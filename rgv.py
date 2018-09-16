@@ -29,7 +29,7 @@ class RGV:
     # 移动到位置
     def move_to_position(self, position):
         if self.state != 0:
-            raise
+            return
         distance = abs(position - self.position)
         if distance == 0:
             return
@@ -40,14 +40,14 @@ class RGV:
     # 洗
     def __wash(self):
         if self.state != 0:
-            raise
+            return
         self.state = 1
         self.wash_timer = k_wash_time
 
     # 投料
     def place(self, cnc):
         if self.state != 0:
-            raise
+            return
         self.state = 1
         if cnc.num % 2 == 0:
             self.place_timer = k_even_place_time
