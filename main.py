@@ -26,7 +26,7 @@ def main(tools = [1] * 8, step = 1, is_error = False):
     cnc_arr = [CNC(i+1, tools[i], is_error) for i in range(0,8)]
     rgv = RGV()
     work_num = 1
-    for i in range(0, 28800):
+    for i in range(0, 8*60*60):
         if rgv.state == 0:
             # 检查是否持有物料
             if rgv.target_work == None:
@@ -45,7 +45,7 @@ def main(tools = [1] * 8, step = 1, is_error = False):
             if get_has_minus(temp_cnc_arr,rgv):
                 # 有负数情况
                 for cnc in temp_cnc_arr:
-                    # 去除正数
+                    # 去除所有正数
                     if cnc.work_timer - get_move_time(cnc.position, rgv.position) > 0:
                         continue
                     # 求出放置移动时间加上下料时间最小的数
@@ -150,15 +150,26 @@ def output(rgv, cnc_arr, tools = ['1']*8, is_error = False, step = 1):
                 err_end.append(err_dict['err_end'])
         df = pd.DataFrame({'err_cnc_num':err_cnc_num, 'err_begin':err_begin, 'err_end':err_end})
         df[['err_cnc_num','err_begin','err_end']].to_excel(excel_path,index=False)
+    # 空载日志
+    cnc_num = []
+    cnc_waste_time = []
+    for cnc in cnc_arr:
+        cnc_num.append(cnc.num)
+        cnc_waste_time.append(cnc.waste_time)
+    excel_path = 'log/' + str(step) + '步工序' + ('错误' if is_error else '无错误') + '-'  + ','.join(tools) + '空载日志.xlsx' 
+    df = pd.DataFrame({'cnc_num':cnc_num, 'cnc_waste_time':cnc_waste_time})
+    df[['cnc_num','cnc_waste_time']].to_excel(excel_path,index=False)
+
+        
+            
 
 def output_all():
     output(**no_err_one_step())
     output(**err_one_step())
     output(**no_err_two_step())
     output(**err_two_step())
+    print('success! please see in log folder')
 
 if __name__ == '__main__':
-    r = no_err_one_step()
-    rgv = r['rgv']
-    print(len(rgv.work_arr))
+    output_all()
 
