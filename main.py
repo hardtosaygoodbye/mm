@@ -8,6 +8,7 @@ import itertools
 import pandas as pd
 from datetime import datetime
 
+
 def get_move_time(position_x, position_y):
     distance = abs(position_x - position_y)
     if distance != 0:
@@ -172,5 +173,8 @@ def output_all():
     print('success! please see in log folder')
 
 if __name__ == '__main__':
+    start = datetime.now() 
     output_all()
+    end = datetime.now() 
+    print((end-start).seconds)
 
